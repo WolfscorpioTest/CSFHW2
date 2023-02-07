@@ -7,4 +7,5 @@ int main(void) {
   char buf[16];
   hex_read(buf);
   // TODO
+  return 0;
 }
