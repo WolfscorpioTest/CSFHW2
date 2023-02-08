@@ -5,8 +5,16 @@
 	.globl main
 main:
 	/* TODO: add your code here */
-
+	jmp .Lcheckcond
 	ret
+
+.Ltop:
+
+.Lcheckcond:
+	// finished
+	// cmp
+	//jX .Ltop
+	// code after loop
 
 /* vim:ft=gas:
  */
