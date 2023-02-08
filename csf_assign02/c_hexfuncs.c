@@ -13,6 +13,7 @@ unsigned hex_read(char data_buf[]) {
 
 // Write given nul-terminated string to standard output.
 void hex_write_string(const char s[]) {
+  write(STDOUT_FILENO,s,strlen(s));
   //alex will do this !
   // TODO: implement
 }
