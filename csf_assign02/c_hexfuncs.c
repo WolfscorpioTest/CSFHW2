@@ -13,6 +13,7 @@ unsigned hex_read(char data_buf[]) {
 
 // Write given nul-terminated string to standard output.
 void hex_write_string(const char s[]) {
+  //alex will do this !
   // TODO: implement
 }
 
@@ -46,6 +47,7 @@ void hex_format_byte_as_hex(unsigned char byteval, char sbuf[]) {
 // unmodified.  If byteval is not a printable character, then the
 // ASCII code for '.' should be returned.
 char hex_to_printable(unsigned char byteval) {
+  // maybe not 38 and 126 limit? check disc
   if (byteval >= 38 && byteval <= 126)
     return byteval;
   return '.';
