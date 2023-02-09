@@ -7,6 +7,9 @@
 	HEX_DIGITS:
 		.ascii "0123456789abcdef"
 
+	.section bss
+		.lcomm three_buf, 3, 1
+
 	.section .text
 
 		.globl hex_read
@@ -18,12 +21,38 @@
     hex_write_string:
     	/* TODO: implement */
     	ret
-
+	 /*
+	  * rdi offset
+	  * rsi *sbuf
+	  */
 		.globl hex_format_offset
     hex_format_offset:
-    	/* TODO: implement */
+		movq %rdi, %r10
+		movq %rsi, %r11
+		movq $3, %r9 /* change this to %al maybe */
+    	jmp .Lcheckcond
     	ret
-
+	.Ltop:
+		/* extracts a byte from rdi*/
+		movq %r10, %rax
+		imul $8, %r8 
+		shrb %r8b, %al /* figure out what is going on with this operand */
+		andb $0xFF, %al
+		/* set up buffer and pass dil */
+		movb %al, %dil
+		mov $three_buf, %rsi
+		call hex_format_byte_as_hex
+		mov %r11, %rsi
+		/* load three_buf into rsi */
+		movq 1($three_buf), %r8
+		movq %r8, 7(%rsi,%r9,-2) 
+		movq ($three_buf), %r8
+		movq %r8, 8(%rsi,%r9,-2)
+		decq %r9
+	.Lcheckcond:
+		cmpq $0, %r9
+		jl .Ltop
+		movb $0, 8(%rsi)
 	/*
 	 * dil byteval
 	 * rsi *sbuf
@@ -42,6 +71,7 @@
 		/* lower half */
 		movb %dil, %al
 		andb $0x0F, %al
+		/* %al = (%r9 + %al) */
 		movb (%r9, %rax), %al
 		movb %al, 1(%rsi)
 		/* add null-terminator */
