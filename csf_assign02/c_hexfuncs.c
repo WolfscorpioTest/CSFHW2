@@ -13,11 +13,25 @@ unsigned hex_read(char data_buf[]) {
 
 // Write given nul-terminated string to standard output.
 void hex_write_string(const char s[]) {
-  // no strlen :(
-  //write(STDOUT_FILENO,s,strlen(s));
+
+  
+  write(STDOUT_FILENO,s,string_length(s));
   //alex will do this !
   // TODO: implement
 }
+
+int string_length(const char s[]) {
+  char *ptr = &s[0];
+
+  while(*ptr!='\0') {
+    ptr++;
+    
+  }
+  return (ptr - &s[0]);
+  
+}
+
+
 
 // Format an unsigned value as an offset string consisting of exactly 8
 // hex digits.  The formatted offset is stored in sbuf, which must

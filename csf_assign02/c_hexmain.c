@@ -4,13 +4,63 @@
 
 int main(void) {
   // a row will only be printed if 16 characters are produced or CTRLD
-  char buf[16];
-  hex_read(buf);
-  char *s = "Hello";
-  //hex_write_string(s);
-  hex_format_offset(8, buf);
-  hex_format_byte_as_hex(236, buf);
-  hex_to_printable(69);
-  // TODO
+  unsigned offset =0;
+  for(;;){
+    char buf[17];
+    unsigned x = hex_read(buf);
+    buf[16] = '\0';
+    if(x==0){
+      break;
+    }
+
+    char offbuf[9];
+    hex_format_offset(offset,offbuf);
+    hex_write_string(offbuf);
+    hex_write_string(": ");
+
+    for(int i = 0 ; i < x ; i++) {
+      unsigned char byte = buf[i];
+      char hbuf[3];
+      hex_format_byte_as_hex(byte, hbuf);
+      hex_write_string(hbuf);
+      hex_write_string(" ");
+    }
+
+    if(x<16){
+      for(int i = 16-x; i > 0; i--) {
+        hex_write_string("   ");
+      }
+    }
+
+    for(int i = 0; i < x; i++) {
+      char sbuf[2];
+      sbuf[0] = hex_to_printable(buf[i]);
+      sbuf[1] = '\0';
+      hex_write_string(sbuf);
+    }
+    
+    if(x<16){
+      
+      hex_write_string("\n");
+      
+      break;
+    }
+    hex_write_string("\n");
+    if(x!=0){
+      offset = offset + 16;
+    }
+  }
+
+
+
+  //read to fill buffer 
+  //print the address
+  //print the hex values
+  //print the string versions
+  //print a new line if you reach 16 bytes
+  //repeat 
+  //one function that takes shit from buffer
+  //one function that prints specific component from each line
+
   return 0;
 }

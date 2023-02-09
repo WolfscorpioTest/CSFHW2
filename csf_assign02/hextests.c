@@ -28,6 +28,7 @@ void cleanup(TestObjs *objs) {
 void testFormatOffset(TestObjs *objs);
 void testFormatByteAsHex(TestObjs *objs);
 void testHexToPrintable(TestObjs *objs);
+void testStringLength(TestObjs *objs);
 
 int main(int argc, char **argv) {
   if (argc > 1) {
@@ -39,6 +40,7 @@ int main(int argc, char **argv) {
   TEST(testFormatOffset);
   TEST(testFormatByteAsHex);
   TEST(testHexToPrintable);
+  TEST(testStringLength);
 
   TEST_FINI();
 
@@ -63,4 +65,12 @@ void testFormatByteAsHex(TestObjs *objs) {
 void testHexToPrintable(TestObjs *objs) {
   ASSERT('H' == hex_to_printable(objs->test_data_1[0]));
   ASSERT('.' == hex_to_printable(objs->test_data_1[13]));
+}
+
+void testStringLength(TestObjs *objs) {
+  //basic test for string length
+  ASSERT(5 == string_length("Hello"));
+
+  //test for empty string 
+  ASSERT(0 == string_length(""));
 }
