@@ -30,22 +30,28 @@
 		/*restores rdi*/
 		pop %rdi
     	ret
-
+	/*
+	 * rdi *data_buf[]
+	 */
 		.globl hex_write_string
     hex_write_string:
 		/*saves rdi on the stack*/
 		push %rdi
+		push %rdx
+		push %rsi
 		call string_length
-
+		mov %rdi, %rsi
 		/*rdi = STDOUT_FILENO*/
 		movq $1, %rdi
 
 		/*sets rsi to s[]*/
-		pop %rsi
+
 		movq %rax, %rdx
-		push %rsi
 		call write
-		/*restores rdi*/
+
+		/*restores registers*/
+		pop %rsi
+		pop %rdx
 		pop %rdi
     	ret
 
@@ -75,6 +81,8 @@
 	  */
 		.globl hex_format_offset
     hex_format_offset:
+		push %r9
+		push %r10
 		movq $3, %r9 /* i = 3 */
     	jmp .Lcheckcond
 	.Ltop:
@@ -122,6 +130,8 @@
 		cmpq $0, %r9
 		jge .Ltop
 		movb $0, 8(%rsi) /*add null terminator */
+		pop %r10
+		pop %r9
 		ret
 	/*
 	 * dil byteval
@@ -169,5 +179,5 @@
 		movq $46,%rax
 		ret
 
-/* vim:ft=gas:assembly
+/* vim:ft=asm
  */
