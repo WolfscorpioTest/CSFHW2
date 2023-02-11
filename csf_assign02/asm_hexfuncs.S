@@ -2,7 +2,6 @@
 
 	.section .rodata
 
-	/* TODO: add read-only data such as strings here */
 	/* define HEX_DIGITS */
 	HEX_DIGITS:
 		.ascii "0123456789abcdef"
@@ -17,13 +16,16 @@
 		pop %rsi
 		movq $16, %rdx
 		call read
-
-    	/* TODO: implement */
     	ret
 
 		.globl hex_write_string
     hex_write_string:
-    	/* TODO: implement */
+		push %rdi
+		call string_length
+		movq $1, %rdi
+		pop %rsi
+		movq %rax, %rdx
+		call write
     	ret
 		
 	 /*
