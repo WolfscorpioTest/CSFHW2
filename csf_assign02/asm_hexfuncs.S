@@ -25,7 +25,7 @@
     hex_write_string:
     	/* TODO: implement */
     	ret
-		
+
 	 /*
 	  * rdi *sbuf
 	  * returns length in rax
@@ -42,6 +42,7 @@
 		jmp .Lstring_length_loop
 	.Lstring_length_done:
 		add $8, %rsp
+		sub %rax, %rdi /* restoring %rdi */
 		ret
 
 	 /*
