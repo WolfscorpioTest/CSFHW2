@@ -46,9 +46,7 @@ int main(void) {
       break;
     }
     hex_write_string("\n");
-    if(x!=0){
-      offset = offset + 16;
-    }
+    offset = offset + 16;
   }
 
 

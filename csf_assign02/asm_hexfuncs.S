@@ -7,8 +7,6 @@
 	HEX_DIGITS:
 		.ascii "0123456789abcdef"
 
-	.section bss
-		.lcomm three_buf, 3, 1
 
 	.section .text
 
@@ -21,58 +19,87 @@
     hex_write_string:
     	/* TODO: implement */
     	ret
+
+		.globl string_length
+	string_length:
+		/* TODO: implement */
+		ret
+
 	 /*
 	  * rdi offset
 	  * rsi *sbuf
+	  * destroys rax, rcx, r9, r10, r11
 	  */
 		.globl hex_format_offset
     hex_format_offset:
-		movq %rdi, %r10
-		movq %rsi, %r11
-		movq $3, %r9 /* change this to %al maybe */
+		movq $3, %r9 /* i = 3 */
     	jmp .Lcheckcond
-    	ret
 	.Ltop:
 		/* extracts a byte from rdi*/
-		movq %r10, %rax
-		imul $8, %r8 
-		shrb %r8b, %al /* figure out what is going on with this operand */
+		movq %rdi, %rax
+		movq %r9, %rcx
+		imul $8, %rcx 
+		shrq %cl, %rax 
 		andb $0xFF, %al
-		/* set up buffer and pass dil */
-		movb %al, %dil
-		mov $three_buf, %rsi
+
+		/* save registers*/
+		mov %rsi, %r10
+	    mov %rdi, %r11
+
+
+		/* make a buffer on the stack here */
+		push %rbp
+		mov %rsp, %rbp
+		subq $16, %rsp
+
+		mov %al, %dil
+		mov %rsp, %rsi
 		call hex_format_byte_as_hex
-		mov %r11, %rsi
-		/* load three_buf into rsi */
-		movq 1($three_buf), %r8
-		movq %r8, 7(%rsi,%r9,-2) 
-		movq ($three_buf), %r8
-		movq %r8, 8(%rsi,%r9,-2)
+
+		/* restore registers*/
+		mov %r10, %rsi
+		mov %r11, %rdi
+
+		movb 1(%rsp), %al /* %al will contain the upper hex character*/
+		movq %r9, %r10     /* move index into %r10 to do math */
+		sal $1, %r10        /* %r10 is doubled */
+		mov $7, %r11	   /* %r11 = 7 */
+		subq %r10, %r11    /* %r11 = %r11 - %r10 */
+		movb %al, (%rsi,%r11)
+
+		movb (%rsp), %al /* %al will contain the lower hex character*/
+		movb %al, -1(%rsi,%r11)
+
+		addq $16, %rsp
+		pop %rbp
+
 		decq %r9
 	.Lcheckcond:
 		cmpq $0, %r9
-		jl .Ltop
-		movb $0, 8(%rsi)
+		jge .Ltop
+		movb $0, 8(%rsi) /*add null terminator */
+		ret
 	/*
 	 * dil byteval
 	 * rsi *sbuf
+	 * destroys %rcx, %rax
 	 */
 		.globl hex_format_byte_as_hex
     hex_format_byte_as_hex:
 		/* load HEX_DIGITS */
-		mov $HEX_DIGITS, %r9
+		mov $HEX_DIGITS, %rcx
 		/* upper half */
 		movzb %dil, %rax
 		shrb $0x4, %al
 		andb $0x0F, %al
 		/* %al = (%r9 + %al) */
-		movb (%r9, %rax), %al
+		movb (%rcx, %rax), %al
 		movb %al, (%rsi)
 		/* lower half */
 		movb %dil, %al
 		andb $0x0F, %al
 		/* %al = (%r9 + %al) */
-		movb (%r9, %rax), %al
+		movb (%rcx, %rax), %al
 		movb %al, 1(%rsi)
 		/* add null-terminator */
 		movb $0, 2(%rsi)

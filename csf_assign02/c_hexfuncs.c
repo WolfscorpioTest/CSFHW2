@@ -13,15 +13,13 @@ unsigned hex_read(char data_buf[]) {
 
 // Write given nul-terminated string to standard output.
 void hex_write_string(const char s[]) {
-
-  
-  write(STDOUT_FILENO,s,string_length(s));
-  //alex will do this !
-  // TODO: implement
+  if(write(STDOUT_FILENO,s,string_length(s) < 0)) {
+    // something went wrong
+  }
 }
 
 int string_length(const char s[]) {
-  char *ptr = &s[0];
+  const char *ptr = &s[0];
 
   while(*ptr!='\0') {
     ptr++;
