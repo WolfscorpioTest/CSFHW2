@@ -2,6 +2,22 @@
 
 #include "hexfuncs.h"  // this is the only header file which may be included!
 
+void write_offset(int offset) {
+  char offbuf[9];
+  hex_format_offset(offset,offbuf);
+  hex_write_string(offbuf);
+  hex_write_string(": ");
+
+}
+
+void add_spaces(int x) {
+  if(x<16){
+    for(int i = 16-x; i > 0; i--) {
+      hex_write_string("   ");
+    }
+  }
+}
+
 int main(void) {
   // a row will only be printed if 16 characters are produced or CTRLD
   unsigned offset =0;
@@ -13,10 +29,7 @@ int main(void) {
       break;
     }
 
-    char offbuf[9];
-    hex_format_offset(offset,offbuf);
-    hex_write_string(offbuf);
-    hex_write_string(": ");
+    write_offset(offset);
 
     for(int i = 0 ; i < x ; i++) {
       unsigned char byte = buf[i];
@@ -26,11 +39,7 @@ int main(void) {
       hex_write_string(" ");
     }
 
-    if(x<16){
-      for(int i = 16-x; i > 0; i--) {
-        hex_write_string("   ");
-      }
-    }
+    add_spaces(x);
 
     for(int i = 0; i < x; i++) {
       char sbuf[2];
@@ -62,3 +71,4 @@ int main(void) {
 
   return 0;
 }
+
