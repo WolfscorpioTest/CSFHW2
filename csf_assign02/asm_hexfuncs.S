@@ -12,6 +12,12 @@
 
 		.globl hex_read
     hex_read:
+		push %rdi
+		movq $0, %rdi
+		pop %rsi
+		movq $16, %rdx
+		call read
+
     	/* TODO: implement */
     	ret
 
