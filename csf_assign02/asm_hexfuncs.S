@@ -9,23 +9,44 @@
 
 	.section .text
 
+	/*
+	  * rdi *data_buf[]
+	  * Read up to 16 bytes from standard input into data_buf.
+	  * returns numbers of bytes read in %rax
+	  */
 		.globl hex_read
     hex_read:
+		/*saves rdi on the stack*/
 		push %rdi
+
+		/*rdi = STDIN_FILENO*/
 		movq $0, %rdi
+
+		/*sets rsi to data_buf[]*/
 		pop %rsi
 		movq $16, %rdx
+		push %rsi
 		call read
+		/*restores rdi*/
+		pop %rdi
     	ret
 
 		.globl hex_write_string
     hex_write_string:
+		/*saves rdi on the stack*/
 		push %rdi
 		call string_length
+
+		/*rdi = STDOUT_FILENO*/
 		movq $1, %rdi
+
+		/*sets rsi to s[]*/
 		pop %rsi
 		movq %rax, %rdx
+		push %rsi
 		call write
+		/*restores rdi*/
+		pop %rdi
     	ret
 
 	 /*
@@ -134,8 +155,8 @@
 	 */
 		.globl hex_to_printable
     hex_to_printable:
-		/* if byteval < 38*/
-		cmpq $38,%rdi
+		/* if byteval < 32*/
+		cmpq $32,%rdi
 		jl non_hex
 		/* if byteval > 126*/
 		cmpq $126,%rdi
