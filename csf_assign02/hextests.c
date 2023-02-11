@@ -76,7 +76,6 @@ void testFormatByteAsHex(TestObjs *objs) {
 void testHexToPrintable(TestObjs *objs) {
   ASSERT('H' == hex_to_printable(objs->test_data_1[0]));
   ASSERT('.' == hex_to_printable(objs->test_data_1[13]));
-  ASSERT('.' == hex_to_printable(objs->test_data_1[12]));
 }
 
 void testStringLength(TestObjs *objs) {

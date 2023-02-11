@@ -1,11 +1,11 @@
 /* Hexdump main function, assembly language version */
 	.section .roData
 		newline:
-			.ascii "\n"
+			.string "\n"
 		space:
-			.ascii " "
+			.string " "
 		three_space:
-			.ascii "   "
+			.string "   "
 
 	.section .text
 
