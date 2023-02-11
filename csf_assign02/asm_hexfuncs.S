@@ -19,10 +19,23 @@
     hex_write_string:
     	/* TODO: implement */
     	ret
-
+		
+	 /*
+	  * rdi *sbuf
+	  * returns length in rax
+	  */
 		.globl string_length
 	string_length:
-		/* TODO: implement */
+		subq $8, %rsp
+		movq $0, %rax
+	.Lstring_length_loop:
+		cmpb $0, (%rdi)
+		jz .Lstring_length_done
+		inc %rax
+		inc %rdi
+		jmp .Lstring_length_loop
+	.Lstring_length_done:
+		add $8, %rsp
 		ret
 
 	 /*
@@ -51,6 +64,7 @@
 		push %rbp
 		mov %rsp, %rbp
 		subq $16, %rsp
+
 
 		mov %al, %dil
 		mov %rsp, %rsi
