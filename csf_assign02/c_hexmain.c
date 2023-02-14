@@ -15,6 +15,7 @@ void add_spaces(int x) {
     for(int i = 16-x; i > 0; i--) {
       hex_write_string("   ");
     }
+    
   }
 }
 
@@ -40,13 +41,14 @@ int main(void) {
     }
 
     add_spaces(x);
-
+    hex_write_string(" ");
     for(int i = 0; i < x; i++) {
       char sbuf[2];
       sbuf[0] = hex_to_printable(buf[i]);
       sbuf[1] = '\0';
       
       hex_write_string(sbuf);
+      
     }
     
     if(x<16){
@@ -55,6 +57,7 @@ int main(void) {
       
       break;
     }
+    
     hex_write_string("\n");
     offset = offset + 16;
   }
