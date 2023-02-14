@@ -45,6 +45,7 @@ int main(void) {
       char sbuf[2];
       sbuf[0] = hex_to_printable(buf[i]);
       sbuf[1] = '\0';
+      
       hex_write_string(sbuf);
     }
     
