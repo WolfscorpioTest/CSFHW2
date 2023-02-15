@@ -108,6 +108,8 @@ write_spaces:
 	cmp $0, %r9
 	jge .Lspaces_loop
 .Lwoffset_end:
+    mov $space, %rdi
+    call hex_write_string
 	pop %rdi
 	pop %r9
 	ret
