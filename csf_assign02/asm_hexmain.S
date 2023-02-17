@@ -88,24 +88,30 @@ main:
 	 */
 write_hex:
 	push %r9
-	push %r10
-	# make a hex buffer
-	push %rbp
-	movq %rbp, %rsp
-	subq $8, %rsp
+	push %r11
 
-	mov	0, %r9 # intitialize counter
+
+	mov	$0, %r9 # intitialize counter
 .Lhex_loop:
 	push %rsi
 	push %rdi
+
+	# make a hex buffer
+	push %rbp
+	movq %rsp, %rbp
+	subq $16, %rsp
 	mov %rsp, %rsi
 
-	movb (%rdi,%r9), %r10b
-	movb %r10b, %dil
+	movq (%rdi,%r9,1), %r11
+	movb %r11b, %dil
 	call hex_format_byte_as_hex # takes %dil and $rsi
 
 	mov %rsi, %rdi
 	call hex_write_string
+	
+	# clean up the buffer
+	addq $16, %rsp
+	pop %rbp
 
 	mov $space, %rdi
 	call hex_write_string
@@ -117,10 +123,8 @@ write_hex:
 	cmpq %rsi, %r9
 	jb .Lhex_loop
 
-	# clean up the buffer
-	addq $8, %rsp
-	pop %rbp
-	pop %r10
+
+	pop %r11
 	pop %r9
 	ret
 
@@ -128,6 +132,7 @@ write_hex:
 	 *	%rdi offset
 	 */
 write_offset:
+	push %r10
 	/* create buffer */
 	push %rbp
 	mov %rsp, %rbp
@@ -146,6 +151,7 @@ write_offset:
 	
 	addq $16, %rsp
 	popq %rbp
+	pop %r10
 	ret
 
 
