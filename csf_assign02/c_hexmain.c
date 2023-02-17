@@ -29,9 +29,7 @@ int main(void) {
     if(x==0){
       break;
     }
-
     write_offset(offset);
-
     for(int i = 0 ; i < x ; i++) {
       unsigned char byte = buf[i];
       char hbuf[3];
@@ -39,40 +37,20 @@ int main(void) {
       hex_write_string(hbuf);
       hex_write_string(" ");
     }
-
     add_spaces(x);
-
     for(int i = 0; i < x; i++) {
       char sbuf[2];
       sbuf[0] = hex_to_printable(buf[i]);
       sbuf[1] = '\0';
-      
       hex_write_string(sbuf);
-      
     }
-    
     if(x<16){
-      
       hex_write_string("\n");
-      
       break;
     }
-    
     hex_write_string("\n");
     offset = offset + 16;
   }
-
-
-
-  //read to fill buffer 
-  //print the address
-  //print the hex values
-  //print the string versions
-  //print a new line if you reach 16 bytes
-  //repeat 
-  //one function that takes shit from buffer
-  //one function that prints specific component from each line
-
   return 0;
 }
 

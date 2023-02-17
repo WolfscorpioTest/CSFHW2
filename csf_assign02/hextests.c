@@ -78,10 +78,18 @@ void testHexToPrintable(TestObjs *objs) {
   ASSERT('.' == hex_to_printable(objs->test_data_1[13]));
 }
 
+int str_length(const char s[]) {
+  const char *ptr = &s[0];
+  while(*ptr!='\0') {
+    ptr++;
+  }
+  return (ptr - &s[0]);
+}
+
 void testStringLength(TestObjs *objs) {
   //basic test for string length
-  ASSERT(5 == string_length("Hello"));
+  ASSERT(5 == str_length("Hello"));
 
   //test for empty string 
-  ASSERT(0 == string_length(""));
+  ASSERT(0 == str_length(""));
 }

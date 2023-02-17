@@ -11,25 +11,20 @@ unsigned hex_read(char data_buf[]) {
   return bytes;
 }
 
-// Write given nul-terminated string to standard output.
+int string_length(const char s[]) {
+  const char *ptr = &s[0];
+  while(*ptr!='\0') {
+    ptr++;
+  }
+  return (ptr - &s[0]);
+}
+
+// Write given null-terminated string to standard output.
 void hex_write_string(const char s[]) {
   if(write(STDOUT_FILENO,s,string_length(s)) < 0) {
     // something went wrong
   }
 }
-
-int string_length(const char s[]) {
-  const char *ptr = &s[0];
-
-  while(*ptr!='\0') {
-    ptr++;
-    
-  }
-  return (ptr - &s[0]);
-  
-}
-
-
 
 // Format an unsigned value as an offset string consisting of exactly 8
 // hex digits.  The formatted offset is stored in sbuf, which must

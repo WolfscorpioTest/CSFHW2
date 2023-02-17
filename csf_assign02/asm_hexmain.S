@@ -6,6 +6,8 @@
 			.string " "
 		three_space:
 			.string "   "
+		colon:
+			.string ": "
 		test:
 			.string "Hello, world"
 
@@ -13,12 +15,15 @@
 
 	.globl main
 main:
+	/* save variables here */
+
+    # movl %esp, %ebp # for correct debugging - who added this?? - mac
 	/* offset %r9 */
 	mov $0, %r9
-	jmp .Lloop
+
 
 .Lloop:
-	/* save variables here */
+
 
 	/* create buffer */
 	pushq %rbp
@@ -36,7 +41,10 @@ main:
 	movq %r9, %rdi
 	call write_offset
 
-	/* insert hex data */	
+	/* insert hex data */
+	mov %rsp, %rdi
+	mov %r10, %rsi
+	call write_hex
 
 
 	/* insert space padding */
@@ -48,7 +56,13 @@ main:
 	/*mov %rsp, %rdi
 	call hex_write_string */
 
-	/* if we have less than 16 add newline */
+	# we are done with the buffer by this point
+	/* restore stack frame */
+	addq $32, %rsp
+	popq %rbp
+
+
+	/* if we have less than 16 add newline and break early */
 	cmpq $16, %r10 
 	jl .Lnewline
 
@@ -64,12 +78,50 @@ main:
 	mov $newline, %rdi
 	call hex_write_string
 .Lend:
-	/* restore stack frame */
-	addq $32, %rsp
-	popq %rbp
-
 	/* restore variables here */
 
+	ret
+
+	/*
+	 * %rdi *buf
+	 * %rsi number_of_characters
+	 */
+write_hex:
+	push %r9
+	push %r10
+	# make a hex buffer
+	push %rbp
+	movq %rbp, %rsp
+	subq $8, %rsp
+
+	mov	0, %r9 # intitialize counter
+.Lhex_loop:
+	push %rsi
+	push %rdi
+	mov %rsp, %rsi
+
+	movb (%rdi,%r9), %r10b
+	movb %r10b, %dil
+	call hex_format_byte_as_hex # takes %dil and $rsi
+
+	mov %rsi, %rdi
+	call hex_write_string
+
+	mov $space, %rdi
+	call hex_write_string
+
+	pop %rdi
+	pop %rsi
+
+	inc %r9
+	cmpq %rsi, %r9
+	jb .Lhex_loop
+
+	# clean up the buffer
+	addq $8, %rsp
+	pop %rbp
+	pop %r10
+	pop %r9
 	ret
 
 	/*
@@ -87,6 +139,9 @@ write_offset:
 
 	/* write the offset */
 	mov %rsi, %rdi
+	call hex_write_string
+
+	mov $colon, %rdi
 	call hex_write_string
 	
 	addq $16, %rsp
