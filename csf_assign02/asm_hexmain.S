@@ -46,6 +46,9 @@ main:
 	mov %r10, %rsi
 	call write_hex
 
+	mov %rsp, %rdi
+	mov %r10, %rsi
+	call write_hexchars
 
 	/* insert space padding */
 	mov $2, %rdi
@@ -126,6 +129,26 @@ write_hex:
 
 	pop %r11
 	pop %r9
+	ret
+
+write_hexchars:
+	push %r10
+	push %rbp
+	mov %rsp, %rbp
+	subq $16, %rsp
+	
+	mov %rsp, %rsi
+	call hex_format_byte_as_hex
+
+	mov %rsi, %rdi
+	call hex_write_string
+
+	mov $space, %rdi
+	call hex_write_string
+
+	addq $16, %rsp
+	popq %rbp
+	pop %r10
 	ret
 
 	/*
