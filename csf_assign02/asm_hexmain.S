@@ -10,7 +10,6 @@
 			.string ": "
 		test:
 			.string "Hello, world"
-
 	.section .text
 
 	.globl main
@@ -20,22 +19,18 @@ main:
     # movl %esp, %ebp # for correct debugging - who added this?? - mac
 	/* offset %r9 */
 	mov $0, %r9
-
-
 .Lloop:
-
-
 	/* create buffer */
 	pushq %rbp
 	movq %rsp, %rbp
-	subq $32, %rsp
+	subq $32, %rsp // stack moved 5*8
 	/* call read */
 	movq %rsp, %rdi
 	call hex_read
 	mov %rax, %r10
 	/* if we read nothing leave early*/
 	cmpq $0, %r10 
-	je .Lend
+	je .Lend // remember to restore stack frame if we leave early
 	
 	/* call write_offset */
 	movq %r9, %rdi
@@ -46,25 +41,21 @@ main:
 	mov %r10, %rsi
 	call write_hex
 
-	mov %rsp, %rdi
-	mov %r10, %rsi
-	call write_hexchars
-
 	/* insert space padding */
 	mov $2, %rdi
 	call write_spaces
 	
 
 	/* insert ascii data */
-	/*mov %rsp, %rdi
-	call hex_write_string */
+	mov %rsp, %rdi
+	mov %r10, %rsi
+	call write_printable
 
 	# we are done with the buffer by this point
 	/* restore stack frame */
 	addq $32, %rsp
 	popq %rbp
-
-
+	
 	/* if we have less than 16 add newline and break early */
 	cmpq $16, %r10 
 	jl .Lnewline
@@ -80,9 +71,53 @@ main:
 	/* write a newline and then return*/
 	mov $newline, %rdi
 	call hex_write_string
+	ret // everything should be cleaned up by this point
 .Lend:
-	/* restore variables here */
+	/* restore stack frame if we exit early */
+	addq $32, %rsp
+	popq %rbp
+	ret
 
+
+	/*
+	 * %rdi *buf
+	 * %rsi number_of_characters
+	 */
+write_printable:
+	push %r9
+	push %r11
+
+	mov	$0, %r9 # intitialize counter
+.Lprint_loop:
+	push %rdi
+
+	# make a hex buffer
+	push %rbp
+	movq %rsp, %rbp
+	subq $16, %rsp // rsp moved 5*8 bytes
+
+
+	movb (%rdi, %r9, 1), %r11b
+	movq $0, %rdi
+	movb %r11b, %dil // load byte from data
+	call hex_to_printable
+
+	movq %rax, (%rsp) // create string of one ASCI character
+	movq $0, 1(%rsp)
+
+	movq %rsp, %rdi
+	call hex_write_string
+
+	# clean up the buffer
+	addq $16, %rsp
+	pop %rbp
+
+	pop %rdi
+	inc %r9
+	cmpq %rsi, %r9
+	jb .Lprint_loop
+	pop %r11
+	pop %r9
 	ret
 
 	/*
@@ -102,8 +137,8 @@ write_hex:
 	# make a hex buffer
 	push %rbp
 	movq %rsp, %rbp
-	subq $16, %rsp
-	mov %rsp, %rsi
+	subq $16, %rsp 
+	mov %rsp, %rsi //rsp moved 7*8
 
 	movq (%rdi,%r9,1), %r11
 	movb %r11b, %dil
@@ -131,25 +166,6 @@ write_hex:
 	pop %r9
 	ret
 
-write_hexchars:
-	push %r10
-	push %rbp
-	mov %rsp, %rbp
-	subq $16, %rsp
-	
-	mov %rsp, %rsi
-	call hex_format_byte_as_hex
-
-	mov %rsi, %rdi
-	call hex_write_string
-
-	mov $space, %rdi
-	call hex_write_string
-
-	addq $16, %rsp
-	popq %rbp
-	pop %r10
-	ret
 
 	/*
 	 *	%rdi offset
@@ -159,7 +175,7 @@ write_offset:
 	/* create buffer */
 	push %rbp
 	mov %rsp, %rbp
-	subq $16, %rsp
+	subq $24, %rsp // stack moved 5*8
 
 	/* generate the hex offseet string */
 	mov %rsp, %rsi
@@ -172,7 +188,7 @@ write_offset:
 	mov $colon, %rdi
 	call hex_write_string
 	
-	addq $16, %rsp
+	addq $24, %rsp
 	popq %rbp
 	pop %r10
 	ret
@@ -184,7 +200,7 @@ write_offset:
 write_spaces:
 	push %r9
 	mov %rdi, %r9
-	push %rdi
+	push %rdi // align stack?
 .Lspaces_loop:
 	mov $three_space, %rdi
 	call hex_write_string

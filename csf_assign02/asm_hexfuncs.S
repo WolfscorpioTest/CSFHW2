@@ -39,7 +39,7 @@
 		push %rdi
 		push %rdx
 		push %rsi
-		call string_length
+		call string_length // %rsp moved 3*8
 		mov %rdi, %rsi
 		/*rdi = STDOUT_FILENO*/
 		movq $1, %rdi
@@ -157,24 +157,24 @@
 		movb %al, 1(%rsi)
 		/* add null-terminator */
 		movb $0, 2(%rsi)
-    	ret
+    ret
 
 	/*
 	 * rdi byteval
 	 * TODO: maybe change quads to bytes
 	 */
 		.globl hex_to_printable
-    hex_to_printable:
+  hex_to_printable:
 		/* if byteval < 32*/
 		cmpq $32,%rdi
-		jl non_hex
+		jl .Lnon_hex
 		/* if byteval > 126*/
 		cmpq $126,%rdi
-		jg non_hex
+		jg .Lnon_hex
 		/* return byteval as is */
 		movq %rdi, %rax
-    	ret
-	non_hex:
+    ret
+.Lnon_hex:
 		/* '.' is 46 decimal. return 'a' */
 		movq $46,%rax
 		ret
