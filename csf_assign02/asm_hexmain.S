@@ -42,7 +42,7 @@ main:
 	call write_hex
 
 	/* insert space padding */
-	mov $2, %rdi
+	mov %r10, %rdi
 	call write_spaces
 	
 
@@ -71,11 +71,13 @@ main:
 	/* write a newline and then return*/
 	mov $newline, %rdi
 	call hex_write_string
+	movq $0, %rax
 	ret // everything should be cleaned up by this point
 .Lend:
 	/* restore stack frame if we exit early */
 	addq $32, %rsp
 	popq %rbp
+	movq $0, %rax
 	ret
 
 
@@ -195,21 +197,25 @@ write_offset:
 
 
 	/*
-	 * rdi number of bytes to fill in
+	 * rdi number of bytes twritten
 	 */
 write_spaces:
 	push %r9
-	mov %rdi, %r9
+	mov $16, %r9
 	push %rdi // align stack?
+
+	cmp $16, %rdi
+	jge .Lwoffset_end
+	subq %rdi, %r9 
 .Lspaces_loop:
 	mov $three_space, %rdi
 	call hex_write_string
 	dec %r9
 	cmp $0, %r9
-	jge .Lspaces_loop
+	jg .Lspaces_loop
 .Lwoffset_end:
-    mov $space, %rdi
-    call hex_write_string
+	mov $space, %rdi
+	call hex_write_string
 	pop %rdi
 	pop %r9
 	ret
